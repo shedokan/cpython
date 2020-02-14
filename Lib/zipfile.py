@@ -1354,7 +1354,7 @@ class ZipFile:
             if self.debug > 2:
                 print(centdir)
             filename = fp.read(centdir[_CD_FILENAME_LENGTH])
-            flags = centdir[5]
+            flags = centdir[_CD_FLAG_BITS]
             if flags & 0x800:
                 # UTF-8 file names extension
                 filename = filename.decode('utf-8')
@@ -1368,11 +1368,11 @@ class ZipFile:
             x.header_offset = centdir[_CD_LOCAL_HEADER_OFFSET]
             (x.create_version, x.create_system, x.extract_version, x.reserved,
              x.flag_bits, x.compress_type, t, d,
-             x.CRC, x.compress_size, x.file_size) = centdir[1:12]
+             x.CRC, x.compress_size, x.file_size) = centdir[_CD_CREATE_VERSION:_CD_UNCOMPRESSED_SIZE+1]
             if x.extract_version > MAX_EXTRACT_VERSION:
                 raise NotImplementedError("zip file version %.1f" %
                                           (x.extract_version / 10))
-            x.volume, x.internal_attr, x.external_attr = centdir[15:18]
+            x.volume, x.internal_attr, x.external_attr = centdir[_CD_DISK_NUMBER_START:_CD_EXTERNAL_FILE_ATTRIBUTES+1]
             # Convert date/time code to (year, month, day, hour, min, sec)
             x._raw_time = t
             x.date_time = ( (d>>9)+1980, (d>>5)&0xF, d&0x1F,
